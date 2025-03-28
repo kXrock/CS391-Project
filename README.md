@@ -1,50 +1,48 @@
-# AlışverişDünyası Web Uygulaması
+# ShoppingWorld Web Application
 
-CS391 Dersi için hazırlanmış basit bir web alışveriş uygulaması.
+## About Project
 
-## Proje Hakkında
+This project is a simple e-commerce web application developed using only HTML, CSS, Bootstrap, and JavaScript.
 
-Bu proje, sadece HTML, CSS, Bootstrap ve JavaScript kullanılarak geliştirilmiş basit bir e-ticaret web uygulamasıdır. JQuery, React gibi ek kütüphaneler kullanılmamıştır.
+## Features
 
-## Özellikler
+- Product listing and search
+- Category-based filtering
+- Price-based sorting
+- View product details
+- Add products to cart
+- Edit and delete items in cart
+- Complete order
 
-- Ürün listeleme ve arama
-- Kategori bazlı filtreleme
-- Fiyata göre sıralama
-- Ürün detayı görüntüleme
-- Sepete ürün ekleme
-- Sepetteki ürünleri düzenleme ve silme
-- Sipariş tamamlama
+## Project Structure
 
-## Proje Yapısı
+- **products.js**: JavaScript file containing product data
+- **products.html**: Main page, lists all products
+- **product-detail.html**: Product detail page
+- **shopping-cart.html**: Shopping cart page
+- **README.md**: Project documentation
 
-- **products.js**: Ürün verilerini içeren JavaScript dosyası
-- **products.html**: Ana sayfa, tüm ürünleri listeler
-- **product-detail.html**: Ürün detay sayfası
-- **shopping-cart.html**: Alışveriş sepeti sayfası
-- **README.md**: Proje dokümantasyonu
+## Installation and Running
 
-## Kurulum ve Çalıştırma
+1. Download the project to your computer
+2. Upload files to a web server or open directly in your browser:
+   - Start by opening `products.html`
 
-1. Projeyi bilgisayarınıza indirin
-2. Dosyaları bir web sunucusuna yükleyin veya doğrudan tarayıcınızda açın:
-   - `products.html` dosyasını açarak başlayın
+Note: Since the project uses browser localStorage feature, no database or server setup is required.
 
-Not: Proje tarayıcı localStorage özelliğini kullandığı için herhangi bir veritabanı veya sunucu kurulumuna gerek yoktur.
+## Usage
 
-## Kullanım
+1. View all products on the main page
+2. Filter products by category, search by text, or sort by price
+3. Click on a product's image or "View Details" button to see product details
+4. On the product detail page, specify quantity and click "Add to Cart" to add the product to your cart
+5. Click the cart icon in the top right to go to the cart page
+6. On the cart page, you can update product quantities, remove items, or complete the order
 
-1. Ana sayfada tüm ürünleri görüntüleyebilirsiniz
-2. Ürünleri kategoriye göre filtreleyebilir, metne göre arayabilir veya fiyata göre sıralayabilirsiniz
-3. Bir ürünün resmine veya "Detayları Gör" butonuna tıklayarak ürün detaylarını görebilirsiniz
-4. Ürün detay sayfasında miktarı belirleyip "Sepete Ekle" butonuna tıklayarak ürünü sepetinize ekleyebilirsiniz
-5. Sağ üstteki sepet simgesine tıklayarak sepet sayfasına gidebilirsiniz
-6. Sepet sayfasında ürün miktarlarını güncelleyebilir, ürünleri kaldırabilir veya siparişi tamamlayabilirsiniz
-
-## Teknolojiler
+## Technologies
 
 - HTML5
 - CSS3
 - Bootstrap 5
 - JavaScript (ES6+)
-- localStorage (Sepet verilerini saklamak için) 
+- localStorage (For storing cart data) 
