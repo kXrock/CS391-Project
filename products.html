@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Listesi</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: contain;
+            padding: 10px;
+        }
+        .product-price {
+            font-weight: bold;
+            color: #007bff;
+        }
+        #filterContainer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .cart-icon {
+            font-size: 1.5rem;
+            position: relative;
+        }
+        #cartCount {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="products.html">AlışverişDünyası</a>
+            <a href="shopping-cart.html" class="nav-link cart-icon">
+                <i class="bi bi-cart"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                <span id="cartCount">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h1 class="mb-4">Ürünlerimiz</h1>
+        
+        <!-- Filter Container -->
+        <div id="filterContainer" class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <label for="categoryFilter" class="form-label">Kategori</label>
+                <select id="categoryFilter" class="form-select">
+                    <option value="">Tüm kategoriler</option>
+                    <!-- Kategoriler JavaScript ile yüklenecek -->
+                </select>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <label for="searchFilter" class="form-label">Ara</label>
+                <input type="text" id="searchFilter" class="form-control" placeholder="Ürün ara...">
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label for="sortFilter" class="form-label">Sırala</label>
+                <select id="sortFilter" class="form-select">
+                    <option value="">Sıralama seçiniz</option>
+                    <option value="low-to-high">Fiyat: Düşükten Yükseğe</option>
+                    <option value="high-to-low">Fiyat: Yüksekten Düşüğe</option>
+                </select>
+            </div>
+            <div class="col-lg-1 col-md-6 d-flex align-items-end">
+                <button id="filterButton" class="btn btn-primary w-100">Filtrele</button>
+            </div>
+        </div>
+        
+        <!-- Products Container -->
+        <div id="productsContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            <!-- Ürünler JavaScript ile burada görüntülenecek -->
+        </div>
+    </div>
+
+    <footer class="bg-light text-center text-lg-start mt-5">
+        <div class="container p-4">
+            <p class="text-center">© 2023 AlışverişDünyası - Tüm Hakları Saklıdır</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="products.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sepet sayacını güncelle
+            updateCartCount();
+            
+            // Kategorileri yükle
+            loadCategories();
+            
+            // Ürünleri yükle
+            displayProducts(products);
+            
+            // Event listeners
+            document.getElementById('filterButton').addEventListener('click', filterProducts);
+            document.getElementById('categoryFilter').addEventListener('change', function() {
+                document.getElementById('searchFilter').value = '';
+                document.getElementById('sortFilter').value = '';
+                filterProducts();
+            });
+            document.getElementById('sortFilter').addEventListener('change', function() {
+                filterProducts();
+            });
+            document.getElementById('searchFilter').addEventListener('input', function() {
+                filterProducts();
+            });
+        });
+        
+        // Kategorileri yükleme fonksiyonu
+        function loadCategories() {
+            const categorySelect = document.getElementById('categoryFilter');
+            const categories = [...new Set(products.map(product => product.category))];
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                categorySelect.appendChild(option);
+            });
+        }
+        
+        // Ürünleri filtreleme fonksiyonu
+        function filterProducts() {
+            const categoryValue = document.getElementById('categoryFilter').value;
+            const searchValue = document.getElementById('searchFilter').value.toLowerCase();
+            const sortValue = document.getElementById('sortFilter').value;
+            
+            let filteredProducts = [...products];
+            
+            // Kategori filtreleme
+            if (categoryValue) {
+                filteredProducts = filteredProducts.filter(product => product.category === categoryValue);
+            }
+            
+            // Arama filtreleme
+            if (searchValue) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.title.toLowerCase().includes(searchValue) || 
+                    product.description.toLowerCase().includes(searchValue)
+                );
+            }
+            
+            // Sıralama
+            if (sortValue === 'low-to-high') {
+                filteredProducts.sort((a, b) => a.price - b.price);
+            } else if (sortValue === 'high-to-low') {
+                filteredProducts.sort((a, b) => b.price - a.price);
+            }
+            
+            // Ürünleri göster
+            displayProducts(filteredProducts);
+        }
+        
+        // Ürünleri görüntüleme fonksiyonu
+        function displayProducts(productList) {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+            
+            if (productList.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center my-5"><h3>Ürün bulunamadı.</h3></div>';
+                return;
+            }
+            
+            productList.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'col';
+                productCard.innerHTML = `
+                    <div class="card h-100">
+                        <a href="product-detail.html?id=${product.id}" class="text-decoration-none">
+                            <img src="${product.thumbnail}" class="card-img-top" alt="${product.title}">
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${product.title}</h5>
+                            <p class="card-text product-price">${product.price.toFixed(2)} TL</p>
+                            <a href="product-detail.html?id=${product.id}" class="btn btn-primary mt-auto">Detayları Gör</a>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+        
+        // Sepet sayacını güncelleme fonksiyonu
+        function updateCartCount() {
+            const cartCountElem = document.getElementById('cartCount');
+            const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            
+            let itemCount = 0;
+            cart.forEach(item => {
+                itemCount += item.quantity;
+            });
+            
+            cartCountElem.textContent = itemCount;
+        }
+    </script>
+</body>
+</html> 

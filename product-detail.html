@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Detayı</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .product-image {
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .quantity-container {
+            max-width: 150px;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .cart-icon {
+            font-size: 1.5rem;
+            position: relative;
+        }
+        #cartCount {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .alert {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="products.html">AlışverişDünyası</a>
+            <a href="shopping-cart.html" class="nav-link cart-icon">
+                <i class="bi bi-cart"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                <span id="cartCount">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="alert alert-success" id="successAlert" role="alert">
+            Ürün sepete eklendi!
+        </div>
+        
+        <div class="alert alert-danger" id="errorAlert" role="alert">
+            Lütfen bir miktar seçiniz!
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="products.html" class="btn btn-outline-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Ürünlere Dön
+                </a>
+            </div>
+        </div>
+        
+        <div class="row" id="productDetail">
+            <!-- Ürün detayı JavaScript ile yüklenecek -->
+        </div>
+    </div>
+
+    <footer class="bg-light text-center text-lg-start mt-5">
+        <div class="container p-4">
+            <p class="text-center">© 2023 AlışverişDünyası - Tüm Hakları Saklıdır</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="products.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // URL'den ürün ID'sini al
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = parseInt(urlParams.get('id'));
+            
+            // Sepet sayacını güncelle
+            updateCartCount();
+            
+            // Ürün detaylarını yükle
+            loadProductDetails(productId);
+        });
+        
+        // Ürün detaylarını yükleme fonksiyonu
+        function loadProductDetails(productId) {
+            // Ürünü bul
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) {
+                document.getElementById('productDetail').innerHTML = '<div class="col-12 text-center my-5"><h3>Ürün bulunamadı.</h3></div>';
+                return;
+            }
+            
+            document.title = product.title + ' - AlışverişDünyası';
+            
+            // Ürün detaylarını oluştur
+            const detailsContainer = document.getElementById('productDetail');
+            detailsContainer.innerHTML = `
+                <div class="col-md-6 mb-4">
+                    <img src="${product.images[0]}" class="img-fluid product-image" alt="${product.title}">
+                </div>
+                <div class="col-md-6">
+                    <h1>${product.title}</h1>
+                    <p class="product-price">${product.price.toFixed(2)} TL</p>
+                    <hr>
+                    <p>${product.description}</p>
+                    <p><strong>Kategori:</strong> ${product.category}</p>
+                    <hr>
+                    
+                    <form id="addToCartForm">
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Miktar:</label>
+                            <div class="input-group quantity-container">
+                                <button type="button" class="btn btn-outline-secondary" id="decreaseQuantity">-</button>
+                                <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="10">
+                                <button type="button" class="btn btn-outline-secondary" id="increaseQuantity">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p><strong>Toplam Tutar:</strong> <span id="totalAmount">${product.price.toFixed(2)} TL</span></p>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="addToCartBtn">Sepete Ekle</button>
+                            <a href="shopping-cart.html" class="btn btn-outline-secondary">Sepete Git</a>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            // Event listeners
+            document.getElementById('decreaseQuantity').addEventListener('click', function() {
+                const quantityInput = document.getElementById('quantity');
+                if (parseInt(quantityInput.value) > 1) {
+                    quantityInput.value = parseInt(quantityInput.value) - 1;
+                    updateTotalAmount(product.price);
+                }
+            });
+            
+            document.getElementById('increaseQuantity').addEventListener('click', function() {
+                const quantityInput = document.getElementById('quantity');
+                if (parseInt(quantityInput.value) < 10) {
+                    quantityInput.value = parseInt(quantityInput.value) + 1;
+                    updateTotalAmount(product.price);
+                }
+            });
+            
+            document.getElementById('quantity').addEventListener('change', function() {
+                updateTotalAmount(product.price);
+            });
+            
+            document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addToCart(product);
+            });
+        }
+        
+        // Toplam tutarı güncelleme fonksiyonu
+        function updateTotalAmount(price) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const totalAmount = price * quantity;
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2) + ' TL';
+        }
+        
+        // Sepete ekleme fonksiyonu
+        function addToCart(product) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            if (isNaN(quantity) || quantity < 1) {
+                document.getElementById('errorAlert').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('errorAlert').style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            // localStorage'dan sepeti al
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            
+            // Ürün zaten sepette var mı kontrol et
+            const existingItemIndex = cart.findIndex(item => item.productId === product.id);
+            
+            if (existingItemIndex !== -1) {
+                // Ürün zaten sepette, miktarını güncelle
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                // Yeni ürün ekle
+                cart.push({
+                    productId: product.id,
+                    quantity: quantity
+                });
+            }
+            
+            // Sepeti localStorage'a kaydet
+            localStorage.setItem('shoppingCart', JSON.stringify(cart));
+            
+            // Sepet sayacını güncelle
+            updateCartCount();
+            
+            // Başarı mesajını göster
+            document.getElementById('successAlert').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successAlert').style.display = 'none';
+            }, 3000);
+        }
+        
+        // Sepet sayacını güncelleme fonksiyonu
+        function updateCartCount() {
+            const cartCountElem = document.getElementById('cartCount');
+            const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            
+            let itemCount = 0;
+            cart.forEach(item => {
+                itemCount += item.quantity;
+            });
+            
+            cartCountElem.textContent = itemCount;
+        }
+    </script>
+</body>
+</html> 

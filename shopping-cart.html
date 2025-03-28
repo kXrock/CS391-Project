@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alışveriş Sepeti</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .cart-item-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .quantity-container {
+            max-width: 120px;
+        }
+        .cart-summary {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 50px 0;
+        }
+        .cart-icon {
+            font-size: 1.5rem;
+            position: relative;
+        }
+        #cartCount {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .alert {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="products.html">AlışverişDünyası</a>
+            <a href="shopping-cart.html" class="nav-link cart-icon">
+                <i class="bi bi-cart"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                <span id="cartCount">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="alert alert-success" id="successAlert" role="alert">
+            Siparişiniz tamamlandı! Teşekkür ederiz.
+        </div>
+        
+        <h1 class="mb-4">Alışveriş Sepeti</h1>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="products.html" class="btn btn-outline-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Alışverişe Devam Et
+                </a>
+            </div>
+        </div>
+        
+        <div id="cartContent" class="row">
+            <!-- Sepet içeriği JavaScript ile yüklenecek -->
+        </div>
+    </div>
+
+    <footer class="bg-light text-center text-lg-start mt-5">
+        <div class="container p-4">
+            <p class="text-center">© 2023 AlışverişDünyası - Tüm Hakları Saklıdır</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="products.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sepet sayacını güncelle
+            updateCartCount();
+            
+            // Sepet içeriğini yükle
+            loadCart();
+        });
+        
+        // Sepet içeriğini yükleme fonksiyonu
+        function loadCart() {
+            const cartContent = document.getElementById('cartContent');
+            const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            
+            if (cart.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="col-12 empty-cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                        </svg>
+                        <h3 class="mt-3">Sepetiniz boş</h3>
+                        <p>Ürün eklemek için alışverişe devam edin.</p>
+                        <a href="products.html" class="btn btn-primary">Alışverişe Başla</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            let cartItems = '';
+            let totalPrice = 0;
+            
+            cart.forEach(cartItem => {
+                const product = products.find(p => p.id === cartItem.productId);
+                if (product) {
+                    const itemTotal = product.price * cartItem.quantity;
+                    totalPrice += itemTotal;
+                    
+                    cartItems += `
+                        <div class="cart-item" data-product-id="${product.id}">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 col-4">
+                                    <img src="${product.thumbnail}" alt="${product.title}" class="img-fluid cart-item-img">
+                                </div>
+                                <div class="col-md-4 col-8">
+                                    <h5><a href="product-detail.html?id=${product.id}" class="text-decoration-none">${product.title}</a></h5>
+                                    <p class="text-muted">${product.price.toFixed(2)} TL</p>
+                                </div>
+                                <div class="col-md-3 col-6 mt-2 mt-md-0">
+                                    <div class="input-group quantity-container">
+                                        <button type="button" class="btn btn-outline-secondary decrease-quantity" data-product-id="${product.id}">-</button>
+                                        <input type="number" class="form-control text-center item-quantity" value="${cartItem.quantity}" min="1" max="10" data-product-id="${product.id}">
+                                        <button type="button" class="btn btn-outline-secondary increase-quantity" data-product-id="${product.id}">+</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-4 mt-2 mt-md-0">
+                                    <p class="fw-bold item-total">${itemTotal.toFixed(2)} TL</p>
+                                </div>
+                                <div class="col-md-1 col-2 mt-2 mt-md-0 text-end">
+                                    <button class="btn btn-sm btn-outline-danger remove-item" data-product-id="${product.id}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            cartContent.innerHTML = `
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            ${cartItems}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4 cart-summary">
+                        <div class="card-body">
+                            <h5 class="card-title">Sipariş Özeti</h5>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Ara Toplam</span>
+                                <span id="subtotal">${totalPrice.toFixed(2)} TL</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Kargo</span>
+                                <span>Ücretsiz</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="fw-bold">Toplam</span>
+                                <span class="fw-bold" id="total">${totalPrice.toFixed(2)} TL</span>
+                            </div>
+                            <button class="btn btn-primary btn-lg w-100" id="checkoutBtn">Siparişi Tamamla</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Event listeners
+            addCartEventListeners();
+        }
+        
+        // Sepet sayacını güncelleme fonksiyonu
+        function updateCartCount() {
+            const cartCountElem = document.getElementById('cartCount');
+            const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            
+            let itemCount = 0;
+            cart.forEach(item => {
+                itemCount += item.quantity;
+            });
+            
+            cartCountElem.textContent = itemCount;
+        }
+        
+        // Sepet için olay dinleyicileri
+        function addCartEventListeners() {
+            // Artırma butonları
+            document.querySelectorAll('.increase-quantity').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-product-id'));
+                    updateQuantity(productId, 1);
+                });
+            });
+            
+            // Azaltma butonları
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-product-id'));
+                    updateQuantity(productId, -1);
+                });
+            });
+            
+            // Miktar inputları
+            document.querySelectorAll('.item-quantity').forEach(input => {
+                input.addEventListener('change', function() {
+                    const productId = parseInt(this.getAttribute('data-product-id'));
+                    const newQuantity = parseInt(this.value);
+                    setQuantity(productId, newQuantity);
+                });
+            });
+            
+            // Kaldırma butonları
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-product-id'));
+                    removeFromCart(productId);
+                });
+            });
+            
+            // Siparişi tamamla butonu
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', checkout);
+            }
+        }
+        
+        // Miktarı güncelleme fonksiyonu
+        function updateQuantity(productId, change) {
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            const index = cart.findIndex(item => item.productId === productId);
+            
+            if (index !== -1) {
+                const newQuantity = cart[index].quantity + change;
+                
+                if (newQuantity < 1) {
+                    return; // Minimum 1 olmalı
+                }
+                
+                if (newQuantity > 10) {
+                    return; // Maximum 10 olmalı
+                }
+                
+                cart[index].quantity = newQuantity;
+                localStorage.setItem('shoppingCart', JSON.stringify(cart));
+                
+                // Sayfa üzerindeki değerleri güncelle
+                const quantityInput = document.querySelector(`.item-quantity[data-product-id="${productId}"]`);
+                quantityInput.value = newQuantity;
+                
+                updateItemTotal(productId, newQuantity);
+                updateCartTotal();
+                updateCartCount();
+            }
+        }
+        
+        // Miktarı doğrudan ayarlama fonksiyonu
+        function setQuantity(productId, newQuantity) {
+            if (newQuantity < 1 || newQuantity > 10 || isNaN(newQuantity)) {
+                // Geçersiz miktar, sayfayı yenile
+                loadCart();
+                return;
+            }
+            
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            const index = cart.findIndex(item => item.productId === productId);
+            
+            if (index !== -1) {
+                cart[index].quantity = newQuantity;
+                localStorage.setItem('shoppingCart', JSON.stringify(cart));
+                
+                updateItemTotal(productId, newQuantity);
+                updateCartTotal();
+                updateCartCount();
+            }
+        }
+        
+        // Ürünü sepetten kaldırma fonksiyonu
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            const newCart = cart.filter(item => item.productId !== productId);
+            
+            localStorage.setItem('shoppingCart', JSON.stringify(newCart));
+            
+            // Sepeti yeniden yükle
+            loadCart();
+            updateCartCount();
+        }
+        
+        // Ürün toplamını güncelleme fonksiyonu
+        function updateItemTotal(productId, quantity) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const itemTotal = product.price * quantity;
+                const itemTotalElem = document.querySelector(`.cart-item[data-product-id="${productId}"] .item-total`);
+                itemTotalElem.textContent = itemTotal.toFixed(2) + ' TL';
+            }
+        }
+        
+        // Sepet toplamını güncelleme fonksiyonu
+        function updateCartTotal() {
+            const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            let totalPrice = 0;
+            
+            cart.forEach(cartItem => {
+                const product = products.find(p => p.id === cartItem.productId);
+                if (product) {
+                    totalPrice += product.price * cartItem.quantity;
+                }
+            });
+            
+            const subtotalElem = document.getElementById('subtotal');
+            const totalElem = document.getElementById('total');
+            
+            if (subtotalElem && totalElem) {
+                subtotalElem.textContent = totalPrice.toFixed(2) + ' TL';
+                totalElem.textContent = totalPrice.toFixed(2) + ' TL';
+            }
+        }
+        
+        // Siparişi tamamlama fonksiyonu
+        function checkout() {
+            // Sepeti temizle
+            localStorage.removeItem('shoppingCart');
+            
+            // Başarı mesajını göster
+            document.getElementById('successAlert').style.display = 'block';
+            
+            // Sepeti boş olarak göster
+            setTimeout(() => {
+                loadCart();
+                updateCartCount();
+                
+                setTimeout(() => {
+                    document.getElementById('successAlert').style.display = 'none';
+                }, 3000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 
